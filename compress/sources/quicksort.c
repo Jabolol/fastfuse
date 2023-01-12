@@ -5,33 +5,60 @@
 ** Pushswap entry point
 */
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-void swap_pointers(uint32_t **ptr_1, uint32_t **ptr_2)
+void swap_pointers(int32_t **ptr_1, int32_t **ptr_2)
 {
-    *ptr_2 = (uint32_t *) ((intptr_t) *ptr_1 ^ (intptr_t) *ptr_2
+    *ptr_2 = (int32_t *) ((intptr_t) *ptr_1 ^ (intptr_t) *ptr_2
         ^ (intptr_t) ((*ptr_1 = *ptr_2)));
 }
 
-uint32_t split(uint32_t **array, uint32_t low, uint32_t high)
+int32_t split(int32_t **array, int32_t low, int32_t high)
 {
-    uint32_t pivot = *array[high];
-    uint32_t index = low - 1;
+    int32_t pivot = *array[high];
+    int32_t index = low - 1;
 
-    for (uint32_t j = low; j <= high - 1; j++)
+    for (int32_t j = low; j <= high - 1; j++)
         if (*array[j] <= pivot)
             swap_pointers(&array[++index], &array[j]);
     swap_pointers(&array[index + 1], &array[high]);
     return index + 1;
 }
 
-void quicksort(uint32_t **array, uint32_t low, uint32_t high)
+void quicksort(int32_t **array, int32_t low, int32_t high)
 {
     if (low >= high)
         return;
-    uint32_t pivot_position = split(array, low, high);
+    int32_t pivot_position = split(array, low, high);
     quicksort(array, low, pivot_position - 1);
     quicksort(array, pivot_position + 1, high);
+}
+
+void _swap_pointers(int32_t *ptr_1, int32_t *ptr_2)
+{
+    *ptr_2 = (int32_t) ((intptr_t) *ptr_1 ^ (intptr_t) *ptr_2
+        ^ (intptr_t) ((*ptr_1 = *ptr_2)));
+}
+
+int32_t _split(int32_t *array, int32_t low, int32_t high)
+{
+    int32_t pivot = array[high];
+    int32_t index = low - 1;
+
+    for (int32_t j = low; j <= high - 1; j++)
+        if (array[j] <= pivot)
+            _swap_pointers(&array[++index], &array[j]);
+    _swap_pointers(&array[index + 1], &array[high]);
+    return index + 1;
+}
+
+void _quicksort(int32_t *array, int32_t low, int32_t high)
+{
+    if (low >= high)
+        return;
+    int32_t pivot_position = _split(array, low, high);
+    _quicksort(array, low, pivot_position - 1);
+    _quicksort(array, pivot_position + 1, high);
 }
