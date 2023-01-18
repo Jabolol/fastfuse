@@ -23,4 +23,5 @@ void swap_pointers(int32_t **ptr_1, int32_t **ptr_2);
 int32_t split(int32_t **array, int32_t low, int32_t high);
 void quicksort(int32_t **array, int32_t low, int32_t high);
 void swap_pointers_leaves(leaf_t **ptr_1, leaf_t **ptr_2);
+char **split_str(char const *readonly_str, bool (*fn)(char const));
 #endif
