@@ -120,7 +120,7 @@ void write_header(char **paths, FILE *fstream)
                     byte = 0;
                 }
             }
-            temp = 1;
+            temp = SEPARATOR_BYTE;
             fwrite(&temp, 1, 1, fstream);
         }
     }
@@ -132,14 +132,13 @@ void write_header(char **paths, FILE *fstream)
         byte = 0;
     }
 
-    temp = 2;
+    temp = END_BYTE;
     fwrite(&temp, 1, 1, fstream);
 }
 
 void write_payload(char **paths, char *my_str, struct stat *st, FILE *fstream)
 {
     uint8_t byte = 0;
-    uint8_t temp = 0;
     int32_t bit_count = 0;
 
     for (int32_t j = 0; j < st->st_size; j++) {
@@ -220,10 +219,6 @@ int main(int argc, char **argv)
     FILE *fstream = stdout;
     if (!fstream)
         return -1;
-
-    uint8_t byte = 0;
-    uint8_t temp = 0;
-    int32_t bit_count = 0;
 
     write_header(paths, fstream);
     write_payload(paths, my_str, &st, fstream);
