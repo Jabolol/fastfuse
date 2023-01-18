@@ -12,6 +12,7 @@
     #define SEPARATOR_BYTE 1
     #define END_BYTE       2
     #include <stdint.h>
+    #include <stdbool.h>
 typedef struct leaf leaf_t;
 typedef struct leaf {
     leaf_t *left;
