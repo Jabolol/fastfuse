@@ -7,8 +7,10 @@
 
 #ifndef __SHARED
     #define __SHARED
-    #define MAX_ARR_LEN 256
-    #define BYTE_LEN    8
+    #define MAX_ARR_LEN    256
+    #define BYTE_LEN       8
+    #define SEPARATOR_BYTE 1
+    #define END_BYTE       2
     #include <stdint.h>
 typedef struct leaf leaf_t;
 typedef struct leaf {
