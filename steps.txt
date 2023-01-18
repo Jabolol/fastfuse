@@ -1,3 +1,0 @@
-1. leer el archivo bin. -> open-read
-2. traducir binario a caracteres con "diccionario". loop-> count < final del archivo, strcmp -> if letras c== binario
-3. nuevo archivo con contenido traducido. a-out > name.loqsea
