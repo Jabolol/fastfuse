@@ -134,7 +134,8 @@ void write_header(char **paths, FILE *fstream)
     fwrite(&temp, 1, 1, fstream);
 }
 
-void write_payload(char **paths, char *my_str, struct stat *st, FILE *fstream)
+void write_payload(
+    char **paths, uint8_t *my_str, struct stat *st, FILE *fstream)
 {
     uint8_t byte = 0;
     int32_t bit_count = 0;
@@ -176,9 +177,10 @@ int main(int argc, char **argv)
     FILE *f = fopen(argv[1], "r");
     fread(bufff, st.st_size, 1, f);
     fclose(f);
-    char *my_str = bufff;
 
-    int32_t string_length = strlen(my_str);
+    int32_t string_length = strlen(bufff);
+    uint8_t *my_str = calloc(string_length, 1);
+    memcpy(my_str, bufff, string_length);
     int32_t **array_map = calloc(MAX_ARR_LEN, sizeof(int32_t *));
     int32_t *pool = calloc(MAX_ARR_LEN, sizeof(int32_t));
 
@@ -187,7 +189,7 @@ int main(int argc, char **argv)
     }
 
     for (int32_t i = 0; i < string_length; i++) {
-        *(pool + (uint8_t) * (my_str + i)) += 1;
+        *(pool + *(my_str + i)) += 1;
     }
 
     quicksort(array_map, 0, MAX_ARR_LEN - 1);
@@ -223,6 +225,7 @@ int main(int argc, char **argv)
 
     fclose(fstream);
     free(array_map);
+    free(my_str);
     free(pool);
     free(bufff);
     return 0;
