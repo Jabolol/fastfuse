@@ -67,7 +67,7 @@ leaf_t **populate_leaves(
         }
     }
 
-    for (int i = *leaf_count / 2 - 1; i >= 0; i--) {
+    for (int32_t i = *leaf_count / 2 - 1; i >= 0; i--) {
         min_heap(leaf_array, *leaf_count, i);
     }
     return leaf_array;
@@ -124,14 +124,12 @@ void write_header(char **paths, FILE *fstream)
             fwrite(&temp, 1, 1, fstream);
         }
     }
-
     if (bit_count > 0) {
         byte = byte << (BYTE_LEN - bit_count);
         fwrite(&byte, 1, 1, fstream);
         bit_count = 0;
         byte = 0;
     }
-
     temp = END_BYTE;
     fwrite(&temp, 1, 1, fstream);
 }
@@ -184,7 +182,7 @@ int main(int argc, char **argv)
     int32_t **array_map = calloc(MAX_ARR_LEN, sizeof(int32_t *));
     int32_t *pool = calloc(MAX_ARR_LEN, sizeof(int32_t));
 
-    for (int i = 0; i < MAX_ARR_LEN; i++) {
+    for (int32_t i = 0; i < MAX_ARR_LEN; i++) {
         *(array_map + i) = pool + i;
     }
 
