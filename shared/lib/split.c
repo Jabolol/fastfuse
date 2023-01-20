@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char **split_str(char const *readonly_str, bool (*fn)(char const))
+char **split_str(char const *readonly_str, bool (*fn)(uint8_t const))
 {
     char *string = strdup(readonly_str);
     uint32_t len = strlen(string);
