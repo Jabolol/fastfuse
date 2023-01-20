@@ -5,14 +5,14 @@
 ## This is just a Makefile
 ##
 
-NAME = antman
+NAME = main
 TEST_BINARY = unit_tests
 LIB_NAME = libmy.a
-DEV_NAME = antman
+DEV_NAME = dev
 ANTMAN_NAME = antman
-ANTMAN_DIR = compress
+ANTMAN_DIR = antman
 GIANTMAN_NAME = giantman
-GIANTMAN_DIR = decompress
+GIANTMAN_DIR = giantman
 CC = gcc
 FLAGS = -c
 DEV_FLAGS = -o $(DEV_NAME) -g -Wall -Wextra
@@ -59,9 +59,7 @@ $(DEV_NAME):
 	@ $(MKDIR_PATH) -p ${DIST_DIR}
 	@ printf '${PURPLE}Executing ${GREEN}${DEV_NAME}${PURPLE} rule.${NORMAL}\n'
 	@ $(MAKE) -C ${ANTMAN_DIR} all
-	@ $(MV_PATH) ${ANTMAN_DIR}/${ANTMAN_NAME} ${DIST_DIR}/${ANTMAN_NAME}
 	@ $(MAKE) -C ${GIANTMAN_DIR} all
-	@ $(MV_PATH) ${GIANTMAN_DIR}/${GIANTMAN_NAME} ${DIST_DIR}/${GIANTMAN_NAME}
 
 clean:
 	@ printf '${PURPLE}Executing ${GREEN}clean${PURPLE} rule.${NORMAL}\n'
