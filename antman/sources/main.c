@@ -5,14 +5,6 @@
 ** Antman entry point
 */
 
-#include <assert.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
 #include "../include/shared.h"
 #include "../include/my_printf.h"
 
@@ -99,36 +91,17 @@ void build_tree(leaf_t **root, leaf_t **leaf_array, int32_t leaf_count)
 
 void write_header(char **paths, FILE *fstream)
 {
-    uint8_t byte = 0;
     uint8_t temp = 0;
-    int32_t bit_count = 0;
 
     for (int32_t i = 0; i < MAX_ARR_LEN; i++) {
         if (*(paths + i) != NULL) {
             temp = i;
             fwrite(&temp, 1, 1, fstream);
             uint64_t len = strlen(*(paths + i));
-            for (uint64_t j = 0; j < len; j++) {
-                byte = byte << 1;
-                if (*(*(paths + i) + j) == '1') {
-                    byte = byte | 1;
-                }
-                bit_count = bit_count + 1;
-                if (bit_count == BYTE_LEN) {
-                    fwrite(&byte, 1, 1, fstream);
-                    bit_count = 0;
-                    byte = 0;
-                }
-            }
+            fwrite(*(paths + i), 1, len, fstream);
             temp = SEPARATOR_BYTE;
             fwrite(&temp, 1, 1, fstream);
         }
-    }
-    if (bit_count > 0) {
-        byte = byte << (BYTE_LEN - bit_count);
-        fwrite(&byte, 1, 1, fstream);
-        bit_count = 0;
-        byte = 0;
     }
     temp = END_BYTE;
     fwrite(&temp, 1, 1, fstream);
@@ -143,8 +116,7 @@ void write_payload(
     for (int32_t j = 0; j < st->st_size; j++) {
         if (*(paths + *(my_str + j)) != NULL) {
             uint64_t len = strlen(*(paths + *(my_str + j)));
-            for (uint64_t i = 0; i < len; i++) {
-                byte = byte << 1;
+            for (uint64_t i = 0; i < len; i++, byte = byte << 1) {
                 if (*(*(paths + *(my_str + j)) + i) == '1') {
                     byte = byte | 1;
                 }
