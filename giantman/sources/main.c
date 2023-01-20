@@ -37,7 +37,7 @@ int main(int argc, char **argv)
         return 84;
     }
     struct stat st;
-    if (lstat(argv[1], &st) != 0) {
+    if (lstat(argv[1], &st) != 0 || st.st_size == 0) {
         printf("Invalid file\n");
         return 84;
     }
@@ -46,8 +46,24 @@ int main(int argc, char **argv)
         printf("Couldn't open the file.\n");
         return 84;
     }
+
     char *buff = malloc(st.st_size);
     fread(buff, 1, st.st_size, fstream);
+
+    char *payload_start = NULL;
+
+    for (int32_t i = 0; *(buff + i) != '\0'; i++) {
+        if (*(buff + i) == END_BYTE) {
+            payload_start = buff + i + 1;
+            break;
+        }
+    }
+
+    if (!(*(payload_start - 2) == SEPARATOR_BYTE)) {
+        printf("Couldn't find `END_BYTE` -> payload malformed. Aborting.\n");
+        return 84;
+    }
+
     char **pieces = split_str(buff, &check_char);
     leaf_t *root = calloc(1, sizeof(leaf_t));
     for (int32_t i = 0; *(*(pieces + i)) != END_BYTE; i++) {
@@ -59,38 +75,19 @@ int main(int argc, char **argv)
         free(substr);
     }
 
-    char *payload_start = NULL;
-
-    for (int32_t i = 0; *(buff + i) != '\0'; i++) {
-        if (*(buff + i) == END_BYTE) {
-            payload_start = buff + i + 1;
-            break;
-        }
-    }
-
-    if (!payload_start) {
-        printf("Couldn't find `END_BYTE` -> payload malformed. Aborting.\n");
-        return 84;
-    }
-
     leaf_t *leaf = root;
     uint8_t bit = 0;
 
     for (int64_t i = (payload_start - buff); i < st.st_size; i++) {
         bit = *(buff + i);
         for (uint8_t j = 7; j != UINT8_MAX; j--) {
-            if ((bit & (1 << j)) != 0) {
-                leaf = leaf->right;
-            } else {
-                leaf = leaf->left;
-            }
+            leaf = (bit & (1 << j)) != 0 ? leaf->right : leaf->left;
             if (leaf->value) {
                 write(1, &leaf->value, 1);
                 leaf = root;
             }
         }
     }
-    write(1, "\n", 1);
 
     free(pieces);
     free(buff);
