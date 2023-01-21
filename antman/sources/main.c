@@ -32,8 +32,8 @@ void min_heap(leaf_t **leaf_array, int32_t count, int32_t index)
 void traverse_path(leaf_t *node, char **paths, char *buff, int32_t position)
 {
     if (node->left == NULL && node->right == NULL) {
-        *(paths + node->value) = calloc(position + 1, 1);
-        strncpy(*(paths + node->value), buff, position);
+        *(paths + node->value) = my_calloc(position + 1, 1);
+        my_strncpy(*(paths + node->value), buff, position);
     } else {
         *(buff + position) = '0';
         traverse_path(node->left, paths, buff, position + 1);
@@ -47,11 +47,11 @@ leaf_t **populate_leaves(
 {
     int32_t len = new_length;
     int32_t max_len = len * (len + 1) / 2;
-    leaf_t **leaf_array = calloc(max_len, sizeof(leaf_t *));
+    leaf_t **leaf_array = my_calloc(max_len, sizeof(leaf_t *));
 
     for (int32_t i = 0; i < MAX_ARR_LEN; i++) {
         if (*(pool + i) > 0) {
-            leaf_t *leaf = calloc(1, sizeof(leaf_t));
+            leaf_t *leaf = my_calloc(1, sizeof(leaf_t));
             leaf->count = *(pool + i);
             leaf->value = i;
             *(leaf_array + *leaf_count) = leaf;
@@ -67,7 +67,7 @@ leaf_t **populate_leaves(
 
 void build_tree(leaf_t **root, leaf_t **leaf_array, int32_t leaf_count)
 {
-    while (leaf_count > 1) {
+    for (; leaf_count > 1;) {
         leaf_t *left = *leaf_array;
         *leaf_array = *(leaf_array + (leaf_count - 1));
         leaf_count -= 1;
@@ -78,7 +78,7 @@ void build_tree(leaf_t **root, leaf_t **leaf_array, int32_t leaf_count)
         leaf_count -= 1;
         min_heap(leaf_array, leaf_count, 0);
 
-        *root = calloc(1, sizeof(leaf_t));
+        *root = my_calloc(1, sizeof(leaf_t));
         (*root)->count = left->count + right->count;
         (*root)->left = left;
         (*root)->right = right;
@@ -115,12 +115,12 @@ void write_payload(
 
     for (int32_t j = 0; j < st->st_size; j++) {
         if (*(paths + *(my_str + j)) != NULL) {
-            uint64_t len = strlen(*(paths + *(my_str + j)));
-            for (uint64_t i = 0; i < len; i++, byte = byte << 1) {
+            uint64_t len = my_strlen(*(paths + *(my_str + j)));
+            for (uint64_t i = 0; i < len; i++, byte <<= 1) {
                 if (*(*(paths + *(my_str + j)) + i) == '1') {
-                    byte = byte | 1;
+                    byte |= 1;
                 }
-                bit_count = bit_count + 1;
+                bit_count += 1;
                 if (bit_count == BYTE_LEN) {
                     fwrite(&byte, 1, 1, fstream);
                     bit_count = 0;
@@ -131,7 +131,7 @@ void write_payload(
     }
 
     if (bit_count > 0) {
-        byte = byte << (BYTE_LEN - bit_count);
+        byte <<= (BYTE_LEN - 1 - bit_count);
         fwrite(&byte, 1, 1, fstream);
     }
 }
@@ -139,22 +139,22 @@ void write_payload(
 int main(int argc, char **argv)
 {
     if (argc <= 2) {
-        printf("Usage: ./antman /path/to/file mode\n");
+        my_printf("Usage: ./antman /path/to/file mode\n");
         return 84;
     }
     struct stat st;
     if (lstat(argv[1], &st) != 0)
         return 84;
-    char *bufff = malloc(st.st_size);
+    char *fcontent = malloc(st.st_size);
     FILE *f = fopen(argv[1], "r");
-    fread(bufff, st.st_size, 1, f);
+    fread(fcontent, 1, st.st_size, f);
     fclose(f);
 
-    int32_t string_length = strlen(bufff);
-    uint8_t *my_str = calloc(string_length, 1);
-    memcpy(my_str, bufff, string_length);
-    int32_t **array_map = calloc(MAX_ARR_LEN, sizeof(int32_t *));
-    int32_t *pool = calloc(MAX_ARR_LEN, sizeof(int32_t));
+    int32_t string_length = my_strlen(fcontent);
+    uint8_t *my_str = my_calloc(string_length, 1);
+    memcpy(my_str, fcontent, string_length);
+    int32_t **array_map = my_calloc(MAX_ARR_LEN, sizeof(int32_t *));
+    int32_t *pool = my_calloc(MAX_ARR_LEN, sizeof(int32_t));
 
     for (int32_t i = 0; i < MAX_ARR_LEN; i++) {
         *(array_map + i) = pool + i;
@@ -183,22 +183,17 @@ int main(int argc, char **argv)
     leaf_t *root = NULL;
     build_tree(&root, leaf_array, leaf_count);
 
-    char **paths = calloc(MAX_ARR_LEN, sizeof(char *));
-    char *buff = calloc(MAX_ARR_LEN, 1);
+    char **paths = my_calloc(MAX_ARR_LEN, sizeof(char *));
+    char *buff = my_calloc(MAX_ARR_LEN, 1);
 
     traverse_path(root, paths, buff, 0);
 
-    FILE *fstream = stdout;
-    if (!fstream)
-        return -1;
+    write_header(paths, stdout);
+    write_payload(paths, my_str, &st, stdout);
 
-    write_header(paths, fstream);
-    write_payload(paths, my_str, &st, fstream);
-
-    fclose(fstream);
     free(array_map);
     free(my_str);
     free(pool);
-    free(bufff);
-    return 0;
+    free(fcontent);
+    return EXIT_SUCCESS;
 }
