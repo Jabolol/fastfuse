@@ -11,6 +11,7 @@
     #define BYTE_LEN       8
     #define SEPARATOR_BYTE 1
     #define END_BYTE       2
+    #define EXIT_ERROR     84
     #include <assert.h>
     #include <fcntl.h>
     #include <stdbool.h>
@@ -33,4 +34,7 @@ int32_t split(int32_t **array, int32_t low, int32_t high);
 void quicksort(int32_t **array, int32_t low, int32_t high);
 void swap_pointers_leaves(leaf_t **ptr_1, leaf_t **ptr_2);
 char **split_str(char const *readonly_str, bool (*fn)(uint8_t const));
+void *my_calloc(unsigned long number, unsigned long size);
+char *my_strncpy(char *dest, char const *src, int n);
+int my_strlen(char const *str);
 #endif
