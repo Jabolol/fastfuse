@@ -37,4 +37,5 @@ char **split_str(char const *readonly_str, bool (*fn)(uint8_t const));
 void *my_calloc(unsigned long number, unsigned long size);
 char *my_strncpy(char *dest, char const *src, int n);
 int my_strlen(char const *str);
+bool check_char(const uint8_t);
 #endif
