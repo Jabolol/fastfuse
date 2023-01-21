@@ -38,4 +38,6 @@ void *my_calloc(unsigned long number, unsigned long size);
 char *my_strncpy(char *dest, char const *src, int n);
 int my_strlen(char const *str);
 bool check_char(const uint8_t);
+void *my_memcpy(void *dest, const void *src, int32_t size);
+char *my_strdup(char const *s1);
 #endif
