@@ -1,9 +1,11 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+/*
+** EPITECH PROJECT, 2022
+** split.c
+** File description:
+** split implementation
+*/
+
+#include "../include/shared.h"
 
 char **split_str(char const *readonly_str, bool (*fn)(uint8_t const))
 {
@@ -18,7 +20,7 @@ char **split_str(char const *readonly_str, bool (*fn)(uint8_t const))
         }
     if (delim_len == 0)
         return NULL;
-    if (!(split_string = calloc(delim_len + 2, sizeof(char **))))
+    if (!(split_string = my_calloc(delim_len + 2, sizeof(char **))))
         return NULL;
     for (uint32_t i = 0; i < delim_len + 1;) {
         uint32_t substr_len = strlen(string) + 1;
