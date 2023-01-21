@@ -1,7 +1,10 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+/*
+** EPITECH PROJECT, 2022
+** main.c
+** File description:
+** Giantman entry point
+*/
+
 #include "../include/shared.h"
 #include "../include/my_printf.h"
 
@@ -20,12 +23,12 @@ void build_tree(leaf_t *curr_leaf, char *path, uint8_t letter, int32_t index)
     }
     if (*(path + index) == '1') {
         if (!curr_leaf->right)
-            curr_leaf->right = calloc(1, sizeof(leaf_t));
+            curr_leaf->right = my_calloc(1, sizeof(leaf_t));
         return build_tree(curr_leaf->right, path, letter, index + 1);
     }
     if (*(path + index) == '0') {
         if (!curr_leaf->left)
-            curr_leaf->left = calloc(1, sizeof(leaf_t));
+            curr_leaf->left = my_calloc(1, sizeof(leaf_t));
         return build_tree(curr_leaf->left, path, letter, index + 1);
     }
 }
@@ -33,17 +36,17 @@ void build_tree(leaf_t *curr_leaf, char *path, uint8_t letter, int32_t index)
 int main(int argc, char **argv)
 {
     if (argc != 2) {
-        printf("Usage: ./giantman /path/to/file.bin\n");
+        my_printf("Usage: ./giantman /path/to/file.bin\n");
         return 84;
     }
     struct stat st;
-    if (lstat(argv[1], &st) != 0 || st.st_size == 0) {
-        printf("Invalid file\n");
+    if (stat(argv[1], &st) != 0 || st.st_size == 0) {
+        my_printf("Invalid file\n");
         return 84;
     }
     FILE *fstream = fopen(argv[1], "rb");
     if (!fstream) {
-        printf("Couldn't open the file.\n");
+        my_printf("Couldn't open the file.\n");
         return 84;
     }
 
@@ -60,16 +63,17 @@ int main(int argc, char **argv)
     }
 
     if (!(*(payload_start - 2) == SEPARATOR_BYTE)) {
-        printf("Couldn't find `END_BYTE` -> payload malformed. Aborting.\n");
+        my_printf(
+            "Couldn't find `END_BYTE` -> payload malformed. Aborting.\n");
         return 84;
     }
 
     char **pieces = split_str(buff, &check_char);
-    leaf_t *root = calloc(1, sizeof(leaf_t));
+    leaf_t *root = my_calloc(1, sizeof(leaf_t));
     for (int32_t i = 0; *(*(pieces + i)) != END_BYTE; i++) {
         uint8_t letter = *(*(pieces + i));
-        int64_t len = strlen(*(pieces + i));
-        char *substr = calloc(len, 1);
+        int64_t len = my_strlen(*(pieces + i));
+        char *substr = my_calloc(len, 1);
         memcpy(substr, *(pieces + i) + 1, len - 1);
         build_tree(root, substr, letter, 0);
         free(substr);
@@ -83,7 +87,7 @@ int main(int argc, char **argv)
         for (uint8_t j = 7; j != UINT8_MAX; j--) {
             leaf = (bit & (1 << j)) != 0 ? leaf->right : leaf->left;
             if (leaf->value) {
-                write(1, &leaf->value, 1);
+                fwrite(&leaf->value, 1, 1, stdout);
                 leaf = root;
             }
         }
