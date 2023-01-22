@@ -38,7 +38,7 @@ char *find_end_byte(char *buff)
         }
     }
     if (!(*(payload_start - 2) == SEPARATOR_BYTE)) {
-        P_ERROR("Couldn't find `END_BYTE` payload malformed. Aborting.\n");
+        my_putstr("Couldn't find `END_BYTE` payload malformed. Aborting.\n");
         return NULL;
     }
     return payload_start;
@@ -87,16 +87,16 @@ void decode_payload(char *buff, char *payload_start, struct stat *st)
 int main(int argc, char **argv)
 {
     if (argc <= 2)
-        return 43 + P_ERROR("Usage: ./giantman /path/to/file.bin mode\n");
+        return 43 + my_putstr("Usage: ./giantman /path/to/file.bin mode\n");
     int32_t n = my_getnbr(argv[2]);
     if (n < 0 || n > 3)
-        return 64 + P_ERROR("Mode must be 1 -> 3\n");
+        return 64 + my_putstr("Mode must be 1 -> 3\n");
     struct stat st;
     char *buff = NULL;
     int32_t fd = open(argv[1], O_RDONLY);
     if (stat(argv[1], &st) != 0 || st.st_size == 0 || fd < 0
         || !((buff = malloc(st.st_size))) || !S_ISREG(st.st_mode))
-        return 71 + P_ERROR("Invalid file\n");
+        return 71 + my_putstr("Invalid file\n");
     read(fd, buff, st.st_size);
     char *payload_start = find_end_byte(buff);
     if (!payload_start)
