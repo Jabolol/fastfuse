@@ -16,15 +16,15 @@ void write_header(char **paths)
     for (int32_t i = 0; i < MAX_ARR_LEN; i++) {
         if (*(paths + i) != NULL) {
             temp = i;
-            fwrite(&temp, 1, 1, stdout);
+            write(STDOUT_FILENO, &temp, 1);
             uint64_t len = strlen(*(paths + i));
-            fwrite(*(paths + i), 1, len, stdout);
+            write(STDOUT_FILENO, *(paths + i), len);
             temp = SEPARATOR_BYTE;
-            fwrite(&temp, 1, 1, stdout);
+            write(STDOUT_FILENO, &temp, 1);
         }
     }
     temp = END_BYTE;
-    fwrite(&temp, 1, 1, stdout);
+    write(STDOUT_FILENO, &temp, 1);
 }
 
 void process_byte(char path_bit, uint8_t *byte, int32_t *bit_count)
@@ -33,7 +33,7 @@ void process_byte(char path_bit, uint8_t *byte, int32_t *bit_count)
         *byte |= 1;
     *bit_count += 1;
     if (*bit_count == BYTE_LEN) {
-        fwrite(byte, 1, 1, stdout);
+        write(STDOUT_FILENO, byte, 1);
         *bit_count = 0;
         *byte = 0;
     }
@@ -57,7 +57,7 @@ void write_payload(char **paths, uint8_t *my_str, struct stat *st)
         process_path(paths, *(my_str + j), &byte, &bit_count);
     if (bit_count > 0) {
         byte <<= (BYTE_LEN - 1 - bit_count);
-        fwrite(&byte, 1, 1, stdout);
+        write(STDOUT_FILENO, &byte, 1);
     }
 }
 
