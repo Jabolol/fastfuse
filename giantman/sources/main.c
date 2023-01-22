@@ -38,8 +38,7 @@ char *find_end_byte(char *buff)
         }
     }
     if (!(*(payload_start - 2) == SEPARATOR_BYTE)) {
-        my_printf(
-            "Couldn't find `END_BYTE` -> payload malformed. Aborting.\n");
+        P_ERROR("Couldn't find `END_BYTE` payload malformed. Aborting.\n");
         return NULL;
     }
     return payload_start;
@@ -48,11 +47,17 @@ char *find_end_byte(char *buff)
 leaf_t *populate_root(char *buff)
 {
     leaf_t *root = my_calloc(1, sizeof(leaf_t));
+    if (!root)
+        return NULL;
     char **pieces = split_str(buff, &check_char);
+    if (!pieces)
+        return NULL;
     for (int32_t i = 0; *(*(pieces + i)) != END_BYTE; i++) {
         uint8_t letter = *(*(pieces + i));
         int64_t len = my_strlen(*(pieces + i));
         char *substr = my_calloc(len, 1);
+        if (!substr)
+            return NULL;
         memcpy(substr, *(pieces + i) + 1, len - 1);
         build_tree(root, substr, letter, 0);
         free(substr);
@@ -64,6 +69,8 @@ leaf_t *populate_root(char *buff)
 void decode_payload(char *buff, char *payload_start, struct stat *st)
 {
     leaf_t *root = populate_root(buff);
+    if (!root)
+        return;
     leaf_t *leaf = root;
     uint8_t bit = 0;
 
@@ -79,18 +86,17 @@ void decode_payload(char *buff, char *payload_start, struct stat *st)
 
 int main(int argc, char **argv)
 {
-    if (argc != 2) {
-        my_printf("Usage: ./giantman /path/to/file.bin\n");
-        return EXIT_ERROR;
-    }
+    if (argc <= 2)
+        return 43 + P_ERROR("Usage: ./giantman /path/to/file.bin mode\n");
+    int32_t n = my_getnbr(argv[2]);
+    if (n < 0 || n > 3)
+        return 64 + P_ERROR("Mode must be 1 -> 3\n");
     struct stat st;
     char *buff = NULL;
     int32_t fd = open(argv[1], O_RDONLY);
     if (stat(argv[1], &st) != 0 || st.st_size == 0 || fd < 0
-        || !((buff = malloc(st.st_size))) || !S_ISREG(st.st_size)) {
-        my_printf("Invalid file\n");
-        return EXIT_ERROR;
-    }
+        || !((buff = malloc(st.st_size))) || !S_ISREG(st.st_mode))
+        return 71 + P_ERROR("Invalid file\n");
     read(fd, buff, st.st_size);
     char *payload_start = find_end_byte(buff);
     if (!payload_start)
