@@ -36,10 +36,10 @@ void process_data(char **argv, struct stat *st, int32_t *exit_code)
 int main(int argc, char **argv)
 {
     if (argc <= 2)
-        return 49 + P_ERROR("Usage: ./antman /path/to/file mode\n");
+        return 49 + my_putstr("Usage: ./antman /path/to/file mode\n");
     int32_t mode = my_getnbr(argv[2]);
     if (mode < 0 || mode > 3) {
-        return 71 + P_ERROR("Invalid mode\n");
+        return 71 + my_putstr("Invalid mode\n");
     }
     struct stat st;
     if (lstat(argv[1], &st) != 0 || !S_ISREG(st.st_mode) || st.st_size == 0)
