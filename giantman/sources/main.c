@@ -71,7 +71,7 @@ void decode_payload(char *buff, char *payload_start, struct stat *st)
         bit = *(buff + i);
         for (uint8_t j = 7; j != UINT8_MAX; j--) {
             leaf = (bit & (1 << j)) != 0 ? leaf->right : leaf->left;
-            leaf->value ? fwrite(&leaf->value, 1, 1, stdout) : -1;
+            leaf->value ? write(STDOUT_FILENO, &leaf->value, 1) : 1;
             leaf->value ? leaf = root : NULL;
         }
     }
@@ -85,18 +85,18 @@ int main(int argc, char **argv)
     }
     struct stat st;
     char *buff = NULL;
-    FILE *fstream = fopen(argv[1], "rb");
-    if (stat(argv[1], &st) != 0 || st.st_size == 0 || !fstream
-        || !((buff = malloc(st.st_size)))) {
+    int32_t fd = open(argv[1], O_RDONLY);
+    if (stat(argv[1], &st) != 0 || st.st_size == 0 || fd < 0
+        || !((buff = malloc(st.st_size))) || !S_ISREG(st.st_size)) {
         my_printf("Invalid file\n");
         return EXIT_ERROR;
     }
-    fread(buff, 1, st.st_size, fstream);
+    read(fd, buff, st.st_size);
     char *payload_start = find_end_byte(buff);
     if (!payload_start)
         return EXIT_ERROR;
     decode_payload(buff, payload_start, &st);
     free(buff);
-    fclose(fstream);
+    close(fd);
     return EXIT_SUCCESS;
 }
