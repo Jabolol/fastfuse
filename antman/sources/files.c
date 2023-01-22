@@ -65,10 +65,8 @@ int32_t write_data(leaf_t *root, uint8_t *my_str, struct stat *st)
 {
     char **paths = my_calloc(MAX_ARR_LEN, sizeof(char *));
     char *buff = my_calloc(MAX_ARR_LEN, 1);
-    if (paths == NULL || buff == NULL) {
-        my_printf("Couldn't allocate memory, aborting...\n");
-        return EXIT_ERROR;
-    }
+    if (paths == NULL || buff == NULL)
+        return 46 + P_ERROR("Couldn't allocate memory, aborting...\n");
     traverse_path(root, paths, buff, 0);
     write_header(paths);
     write_payload(paths, my_str, st);
