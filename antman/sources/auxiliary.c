@@ -5,8 +5,8 @@
 ** Antman entry point
 */
 
-#include "../include/shared.h"
 #include "../include/antman.h"
+#include "../include/shared.h"
 #include "../include/my_printf.h"
 
 void populate_pool(
@@ -38,8 +38,10 @@ int32_t compute_length(int32_t **array_map)
 char *read_file(char **argv, struct stat *st)
 {
     char *fcontent = malloc(st->st_size);
-    FILE *f = fopen(argv[1], "r");
-    fread(fcontent, 1, st->st_size, f);
-    fclose(f);
+    int32_t fd = open(argv[1], O_RDONLY);
+    if (fd < 0)
+        return NULL;
+    read(fd, fcontent, st->st_size);
+    close(fd);
     return fcontent;
 }
