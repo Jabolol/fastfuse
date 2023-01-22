@@ -5,8 +5,8 @@
 ** Antman entry point
 */
 
-#include "../include/shared.h"
 #include "../include/antman.h"
+#include "../include/shared.h"
 #include "../include/my_printf.h"
 
 void process_data(char **argv, struct stat *st, int32_t *exit_code)
@@ -39,8 +39,8 @@ int main(int argc, char **argv)
         return 84;
     }
     struct stat st;
-    if (lstat(argv[1], &st) != 0)
-        return 84;
+    if (lstat(argv[1], &st) != 0 || !S_ISREG(st.st_mode) || st.st_size == 0)
+        return EXIT_ERROR;
     int32_t exit_code = 0;
     process_data(argv, &st, &exit_code);
     return exit_code == 0 ? EXIT_SUCCESS : EXIT_ERROR;
