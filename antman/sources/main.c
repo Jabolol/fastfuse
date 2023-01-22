@@ -5,6 +5,7 @@
 ** Antman entry point
 */
 
+#include <stdint.h>
 #include "../include/antman.h"
 #include "../include/shared.h"
 #include "../include/my_printf.h"
@@ -17,7 +18,7 @@ void process_data(char **argv, struct stat *st, int32_t *exit_code)
     int32_t **array_map = my_calloc(MAX_ARR_LEN, sizeof(int32_t *));
     int32_t *pool = my_calloc(MAX_ARR_LEN, sizeof(int32_t));
     if (my_str == NULL || array_map == NULL || pool == NULL)
-        *exit_code = 1 + my_printf("Couldn't allocate memory, aborting...\n");
+        *exit_code = write(1, "Couldn't allocate memory, aborting...\n", 38);
     memcpy(my_str, fcontent, string_length);
     populate_pool(array_map, pool, my_str, string_length);
     int32_t leaf_count = 0;
@@ -34,9 +35,11 @@ void process_data(char **argv, struct stat *st, int32_t *exit_code)
 
 int main(int argc, char **argv)
 {
-    if (argc <= 2) {
-        my_printf("Usage: ./antman /path/to/file mode\n");
-        return 84;
+    if (argc <= 2)
+        return 49 + P_ERROR("Usage: ./antman /path/to/file mode\n");
+    int32_t mode = my_getnbr(argv[2]);
+    if (mode < 0 || mode > 3) {
+        return 71 + P_ERROR("Invalid mode\n");
     }
     struct stat st;
     if (lstat(argv[1], &st) != 0 || !S_ISREG(st.st_mode) || st.st_size == 0)
