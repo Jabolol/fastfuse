@@ -35,5 +35,5 @@ To compress a file, use the following command:
 To decompress a file, use the following command:
 
 ```sh
-./fast_fuse /path/to/output.bin 1 > /path/to/file
+./giantman/giantman /path/to/output.bin 1 > /path/to/file
 ```
