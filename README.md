@@ -17,7 +17,7 @@ integrity.
 Clone the repo:
 
 ```sh
-git clone git@github.com:username/fast-fuse.git .
+git clone git@github.com:Jabolol/fastfuse.git .
 ```
 
 Compile the program:
